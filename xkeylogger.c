@@ -1,4 +1,4 @@
-/* -*- compile-command: "gcc keylogger.c -Wall -pedantic -lX11 -lXi -o keylogger" -*- */
+/* -*- compile-command: "gcc xkeylogger.c -Wall -pedantic -lX11 -lXi -o xkeylogger" -*- */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
