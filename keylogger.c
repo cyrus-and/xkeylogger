@@ -11,9 +11,18 @@ static int KEY_RELEASE_TYPE;
 static void process_event( XDeviceKeyEvent *event )
 {
     KeySym keysym = XKeycodeToKeysym( event->display , event->keycode , 0 );
-    printf( "%s %s\n" ,
-            event->type == KEY_PRESS_TYPE ? "press" : "release" ,
-            XKeysymToString( keysym ) );
+
+    printf( "%c %c %c %c %c %c %c %c %i %s\n" ,
+            event->type == KEY_PRESS_TYPE ? 'P' : 'R' , /* press/release */
+            event->state & ShiftMask ? 'S' : 's' , /* shift */
+            event->state & LockMask ? 'L' : 'l' , /* caps lock */
+            event->state & ControlMask ? 'C' : 'c' , /* control */
+            event->state & Mod1Mask ? 'A' : 'a' , /* alt */
+            event->state & Mod2Mask ? 'N' : 'n' , /* num lock */
+            event->state & Mod4Mask ? 'W' : 'w' , /* windows */
+            event->state & Mod5Mask ? 'G' : 'g' , /* alt gr */
+            event->keycode , /* keycode */
+            XKeysymToString( keysym ) ); /* keysym */
 }
 
 static int get_keybord_id( Display *display , XID *xid )
