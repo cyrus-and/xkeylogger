@@ -23,6 +23,8 @@ static void process_event( XDeviceKeyEvent *event )
             event->state & Mod5Mask ? 'G' : 'g' , /* alt gr */
             event->keycode , /* keycode */
             XKeysymToString( keysym ) ); /* keysym */
+
+    fflush( stdout );
 }
 
 static int get_keybord_id( Display *display , XID *xid )
