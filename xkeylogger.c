@@ -4,40 +4,48 @@
 #include <time.h>
 #include <assert.h>
 #include <X11/Xlib.h>
+#include <X11/XKBlib.h>
 #include <X11/extensions/XInput.h>
 
 static int KEY_PRESS_TYPE;
 
-static void process_event( XDeviceKeyEvent *event , KeySym tr_keysym , char *tr_string )
+struct keystroke_info
 {
-    KeySym keysym;
-    char time_buf[ 20 ] = { 0 };
-    time_t now;
+    time_t timestamp;
+    unsigned int original_keycode;
+    KeySym original_keysym;
+    unsigned int modifier_mask;
+    int translation_available;
+    KeySym translated_keysym;
+    char translated_char[ 4 ];
+};
 
-    /* resolve keysym */
-    keysym = XKeycodeToKeysym( event->display , event->keycode , 0 );
+static void process_event( const struct keystroke_info *info )
+{
+    char time_buf[ 20 ] = { 0 };
 
     /* format timestamp */
-    now = time( NULL );
-    strftime( time_buf , 20 , "%d/%m/%Y %H:%M:%S" , localtime( &now ) );
+    strftime( time_buf , 20 , "%d/%m/%Y %H:%M:%S" , localtime( &info->timestamp ) );
 
     /* dump keystroke info */
     printf( "%s %c %c %c %c %c %c %c %i %s" ,
             time_buf ,
-            event->state & ShiftMask ? 'S' : 's' ,
-            event->state & LockMask ? 'L' : 'l' ,
-            event->state & ControlMask ? 'C' : 'c' ,
-            event->state & Mod1Mask ? 'A' : 'a' , /* alt */
-            event->state & Mod2Mask ? 'N' : 'n' , /* num lock */
-            event->state & Mod4Mask ? 'W' : 'w' , /* windows */
-            event->state & Mod5Mask ? 'G' : 'g' , /* alt gr */
-            event->keycode ,
-            XKeysymToString( keysym ) );
+            info->modifier_mask & ShiftMask ? 'S' : 's' ,
+            info->modifier_mask & LockMask ? 'L' : 'l' ,
+            info->modifier_mask & ControlMask ? 'C' : 'c' ,
+            info->modifier_mask & Mod1Mask ? 'A' : 'a' , /* alt */
+            info->modifier_mask & Mod2Mask ? 'N' : 'n' , /* num lock */
+            info->modifier_mask & Mod4Mask ? 'W' : 'w' , /* windows */
+            info->modifier_mask & Mod5Mask ? 'G' : 'g' , /* alt gr */
+            info->original_keycode ,
+            XKeysymToString( info->original_keysym ) );
 
     /* dump translate keystroke (if available) */
-    if ( *tr_string )
+    if ( info->translation_available )
     {
-        printf( " %s %s" , tr_string , XKeysymToString( tr_keysym ) );
+        printf( " %s %s" ,
+                XKeysymToString( info->translated_keysym ) ,
+                info->translated_char );
     }
 
     printf( "\n" );
@@ -176,17 +184,24 @@ int main( int argc , char *argv[] )
     /* event loop */
     while ( 1 )
     {
-        char tr_string[ 11 ] = { 0 };
-        KeySym tr_keysym;
         XEvent event;
+        XDeviceKeyEvent *device_event;
+        struct keystroke_info info;
 
         /* wait for the next event */
         XNextEvent( display , &event );
 
+        /* fill keystroke info */
+        device_event = ( XDeviceKeyEvent * )&event;
+        info.timestamp = time( NULL );
+        info.original_keycode = device_event->keycode;
+        info.original_keysym = XkbKeycodeToKeysym( display , device_event->keycode , 0 , 0 );
+        info.modifier_mask = device_event->state;
+
         /* translate keystroke */
-        translate_device_key_event( xic , ( XDeviceKeyEvent * )&event , &tr_keysym , tr_string );
+        info.translation_available = translate_device_key_event( xic , device_event , &info.translated_keysym , info.translated_char );
 
         /* process the event */
-        process_event( ( XDeviceKeyEvent * )&event , tr_keysym , tr_string );
+        process_event( &info );
     }
 }
