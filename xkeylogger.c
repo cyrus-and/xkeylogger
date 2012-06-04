@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/XInput.h>
 
@@ -10,11 +11,18 @@ static int KEY_RELEASE_TYPE;
 static void process_event( XDeviceKeyEvent *event )
 {
     KeySym keysym;
+    char time_buf[ 20 ] = { 0 };
+    time_t now;
 
     /* resolve keysym */
     keysym = XKeycodeToKeysym( event->display , event->keycode , 0 );
 
-    printf( "%c %c %c %c %c %c %c %c %i %s\n" ,
+    /* format timestamp */
+    now = time( NULL );
+    strftime( time_buf , 20 , "%d/%m/%Y %H:%M:%S" , localtime( &now ) );
+
+    printf( "%s %c %c %c %c %c %c %c %c %i %s\n" ,
+            time_buf , /* timestamp */
             event->type == KEY_PRESS_TYPE ? 'P' : 'R' , /* press/release */
             event->state & ShiftMask ? 'S' : 's' , /* shift */
             event->state & LockMask ? 'L' : 'l' , /* caps lock */
