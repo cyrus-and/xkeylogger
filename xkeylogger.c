@@ -21,18 +21,19 @@ static void process_event( XDeviceKeyEvent *event )
     now = time( NULL );
     strftime( time_buf , 20 , "%d/%m/%Y %H:%M:%S" , localtime( &now ) );
 
+    /* dump keystroke info */
     printf( "%s %c %c %c %c %c %c %c %c %i %s\n" ,
-            time_buf , /* timestamp */
-            event->type == KEY_PRESS_TYPE ? 'P' : 'R' , /* press/release */
-            event->state & ShiftMask ? 'S' : 's' , /* shift */
-            event->state & LockMask ? 'L' : 'l' , /* caps lock */
-            event->state & ControlMask ? 'C' : 'c' , /* control */
+            time_buf ,
+            event->type == KEY_PRESS_TYPE ? 'P' : 'R' ,
+            event->state & ShiftMask ? 'S' : 's' ,
+            event->state & LockMask ? 'L' : 'l' ,
+            event->state & ControlMask ? 'C' : 'c' ,
             event->state & Mod1Mask ? 'A' : 'a' , /* alt */
             event->state & Mod2Mask ? 'N' : 'n' , /* num lock */
             event->state & Mod4Mask ? 'W' : 'w' , /* windows */
             event->state & Mod5Mask ? 'G' : 'g' , /* alt gr */
-            event->keycode , /* keycode */
-            XKeysymToString( keysym ) ); /* keysym */
+            event->keycode ,
+            XKeysymToString( keysym ) );
 
     fflush( stdout );
 }
