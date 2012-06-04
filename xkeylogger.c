@@ -9,7 +9,10 @@ static int KEY_RELEASE_TYPE;
 
 static void process_event( XDeviceKeyEvent *event )
 {
-    KeySym keysym = XKeycodeToKeysym( event->display , event->keycode , 0 );
+    KeySym keysym;
+
+    /* resolve keysym */
+    keysym = XKeycodeToKeysym( event->display , event->keycode , 0 );
 
     printf( "%c %c %c %c %c %c %c %c %i %s\n" ,
             event->type == KEY_PRESS_TYPE ? 'P' : 'R' , /* press/release */
