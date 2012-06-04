@@ -37,9 +37,7 @@ static int get_keybord_id( Display *display , XID *xid )
     for ( i = 0 ; i < n ; i++ )
     {
         /* tries to guess the real ketboard */
-        if ( devices[i].use == IsXExtensionKeyboard &&
-             strcmp( devices[i].name , "Virtual core XTEST keyboard" ) != 0 &&
-             strcmp( devices[i].name , "Power Button" ) != 0 )
+        if ( strcmp( devices[i].name , "AT Translated Set 2 keyboard" ) == 0 )
         {
             *xid = devices[i].id;
             return 1;
