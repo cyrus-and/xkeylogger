@@ -25,7 +25,8 @@ static void process_event( const struct keystroke_info *info )
     char time_buf[ 20 ] = { 0 };
 
     /* format timestamp */
-    strftime( time_buf , 20 , "%d/%m/%Y %H:%M:%S" , localtime( &info->timestamp ) );
+    strftime( time_buf , 20 , "%d/%m/%Y %H:%M:%S" ,
+              localtime( &info->timestamp ) );
 
     /* dump keystroke info */
     printf( "%s %c %c %c %c %c %c %c %i %s" ,
@@ -86,13 +87,14 @@ static XIC get_input_context( Display *display )
     assert( xim = XOpenIM( display , NULL , NULL , NULL ) );
 
     /* fetch styles  */
-    assert( XGetIMValues( xim , XNQueryInputStyle , &xim_styles , NULL ) == NULL );
+    assert( !XGetIMValues( xim , XNQueryInputStyle , &xim_styles , NULL ) );
     assert( xim_styles != NULL );
 
     /* search wanted style */
     for ( xim_style = 0 , i = 0 ; i < xim_styles->count_styles ; i++ )
     {
-        if ( xim_styles->supported_styles[ i ] == ( XIMPreeditNothing | XIMStatusNothing ) )
+        if ( xim_styles->supported_styles[ i ] ==
+             ( XIMPreeditNothing | XIMStatusNothing ) )
         {
             xim_style = xim_styles->supported_styles[ i ];
             break;
@@ -107,7 +109,8 @@ static XIC get_input_context( Display *display )
     return xic;
 }
 
-int translate_device_key_event( XIC xic , XDeviceKeyEvent *event , KeySym *out_keysym , char *out_string )
+int translate_device_key_event( XIC xic , XDeviceKeyEvent *event ,
+                                KeySym *out_keysym , char *out_string )
 {
     XDeviceKeyEvent *device_key_event;
     XKeyEvent key_event;
@@ -129,7 +132,8 @@ int translate_device_key_event( XIC xic , XDeviceKeyEvent *event , KeySym *out_k
     key_event.same_screen = device_key_event->same_screen;
 
     /* translate the keystroke */
-    length = XmbLookupString( xic , &key_event , out_string , 4 , out_keysym , &status );
+    length = XmbLookupString( xic , &key_event , out_string , 4 ,
+                              out_keysym , &status );
     if ( status == XLookupBoth )
     {
         out_string[ length ] = '\0';
@@ -195,11 +199,16 @@ int main( int argc , char *argv[] )
         device_event = ( XDeviceKeyEvent * )&event;
         info.timestamp = time( NULL );
         info.original_keycode = device_event->keycode;
-        info.original_keysym = XkbKeycodeToKeysym( display , device_event->keycode , 0 , 0 );
+        info.original_keysym =
+            XkbKeycodeToKeysym( display , device_event->keycode , 0 , 0 );
         info.modifier_mask = device_event->state;
 
         /* translate keystroke */
-        info.translation_available = translate_device_key_event( xic , device_event , &info.translated_keysym , info.translated_char );
+        info.translation_available =
+            translate_device_key_event( xic ,
+                                        device_event ,
+                                        &info.translated_keysym ,
+                                        info.translated_char );
 
         /* process the event */
         process_event( &info );
