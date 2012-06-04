@@ -99,6 +99,38 @@ static XIC get_input_context( Display *display )
     return xic;
 }
 
+int translate_device_key_event( XIC xic , XDeviceKeyEvent *event , KeySym *out_keysym , char *out_string )
+{
+    XDeviceKeyEvent *device_key_event;
+    XKeyEvent key_event;
+    Status status;
+    int length;
+
+    /* build associated key event */
+    device_key_event = ( XDeviceKeyEvent * )event;
+    key_event.type = KeyPress;
+    key_event.serial = device_key_event->serial;
+    key_event.send_event= device_key_event->send_event;
+    key_event.display = device_key_event->display;
+    key_event.window = device_key_event->window;
+    key_event.root = device_key_event->root;
+    key_event.subwindow = device_key_event->subwindow;
+    key_event.time = device_key_event->time;
+    key_event.state = device_key_event->state;
+    key_event.keycode = device_key_event->keycode;
+    key_event.same_screen = device_key_event->same_screen;
+
+    /* translate the keystroke */
+    length = XmbLookupString( xic , &key_event , out_string , 4 , out_keysym , &status );
+    if ( status == XLookupBoth )
+    {
+        out_string[ length ] = '\0';
+        return 1;
+    }
+
+    return 0;
+}
+
 int main( int argc , char *argv[] )
 {
     Display *display;
@@ -152,28 +184,7 @@ int main( int argc , char *argv[] )
         XNextEvent( display , &event );
 
         /* translate keystroke */
-        {
-            XDeviceKeyEvent *device_key_event;
-            XKeyEvent key_event;
-            Status status;
-
-            /* build associated key event */
-            device_key_event = ( XDeviceKeyEvent * )&event;
-            key_event.type = KeyPress;
-            key_event.serial = device_key_event->serial;
-            key_event.send_event= device_key_event->send_event;
-            key_event.display = device_key_event->display;
-            key_event.window = device_key_event->window;
-            key_event.root = device_key_event->root;
-            key_event.subwindow = device_key_event->subwindow;
-            key_event.time = device_key_event->time;
-            key_event.state = device_key_event->state;
-            key_event.keycode = device_key_event->keycode;
-            key_event.same_screen = device_key_event->same_screen;
-
-            /* translate the keystroke */
-            XmbLookupString( xic , &key_event , tr_string , 10 , &tr_keysym , &status );
-        }
+        translate_device_key_event( xic , ( XDeviceKeyEvent * )&event , &tr_keysym , tr_string );
 
         /* process the event */
         process_event( ( XDeviceKeyEvent * )&event , tr_keysym , tr_string );
