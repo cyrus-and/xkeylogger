@@ -18,6 +18,7 @@ struct keystroke_info
     int translation_available;
     KeySym translated_keysym;
     char translated_char[ 4 ];
+    char* focused_window;
 };
 
 static void process_event( const struct keystroke_info *info )
@@ -48,6 +49,9 @@ static void process_event( const struct keystroke_info *info )
                 XKeysymToString( info->translated_keysym ) ,
                 info->translated_char );
     }
+
+    /* dump window name */
+    printf( " \"%s\"" , info->focused_window );
 
     printf( "\n" );
     fflush( stdout );
@@ -143,6 +147,31 @@ int translate_device_key_event( XIC xic , XDeviceKeyEvent *event ,
     return 0;
 }
 
+char * get_current_window_name( Display *display )
+{
+    Window window;
+    int revert_to;
+    char *name = NULL;
+
+    /* get focused window */
+    XGetInputFocus( display , &window , &revert_to );
+
+    while( XFetchName( display , window , &name ) , !name )
+    {
+        Window root;
+        Window parent;
+        Window *children;
+        unsigned int n_child;
+
+        /* raist up to the main window */
+        XQueryTree( display , window , &root , &parent , &children , &n_child );
+        XFree( children );
+        window = parent;
+    }
+
+    return name;
+}
+
 int main( int argc , char *argv[] )
 {
     Display *display;
@@ -202,6 +231,7 @@ int main( int argc , char *argv[] )
         info.original_keysym =
             XkbKeycodeToKeysym( display , device_event->keycode , 0 , 0 );
         info.modifier_mask = device_event->state;
+        info.focused_window = get_current_window_name( display );
 
         /* translate keystroke */
         info.translation_available =
