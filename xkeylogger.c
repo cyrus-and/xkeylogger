@@ -318,5 +318,8 @@ int main( int argc , char *argv[] )
 
         /* process the event */
         process_event( &info );
+
+        /* cleanup */
+        XFree( info.focused_window_name );
     }
 }
