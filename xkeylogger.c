@@ -19,6 +19,8 @@
 #define VISUAL_RIGHT "\u2192"
 #define VISUAL_DOWN "\u2193"
 
+static char *NO_TITLE = "(no title)";
+
 struct keystroke_info
 {
     time_t timestamp;
@@ -276,6 +278,7 @@ char * get_current_window( Display *display , Window *out_window )
 
         /* raise up to the main window */
         *out_window = parent;
+        if ( parent == root ) return NO_TITLE;
     }
 
     return name;
@@ -355,6 +358,9 @@ int main( int argc , char *argv[] )
         process_event( &info );
 
         /* cleanup */
-        XFree( info.focused_window_name );
+        if ( info.focused_window_name != NO_TITLE )
+        {
+            XFree( info.focused_window_name );
+        }
     }
 }
