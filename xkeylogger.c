@@ -223,27 +223,27 @@ int translate_device_key_event( XIC xic , XDeviceKeyEvent *event ,
 
 char * get_current_window( Display *display , Window *out_window )
 {
-    Window window;
     int revert_to;
     char *name = NULL;
 
     /* get focused window */
-    XGetInputFocus( display , &window , &revert_to );
+    XGetInputFocus( display , out_window , &revert_to );
 
-    while( XFetchName( display , window , &name ) , !name )
+    while ( XFetchName( display , *out_window , &name ) , !name )
     {
         Window root;
         Window parent;
         Window *children;
         unsigned int n_child;
 
-        /* raist up to the main window */
-        XQueryTree( display , window , &root , &parent , &children , &n_child );
+        /* query the hierarchy from that window */
+        XQueryTree( display , *out_window , &root , &parent , &children , &n_child );
         XFree( children );
-        window = parent;
+
+        /* raise up to the main window */
+        *out_window = parent;
     }
 
-    if ( out_window ) *out_window = window;
     return name;
 }
 
