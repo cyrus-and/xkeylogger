@@ -29,7 +29,7 @@ struct keystroke_info
 static void process_event( const struct keystroke_info *info )
 {
     static Window current = 0;
-    char time_buf[ 22 ] = { 0 };
+    char time_buf[ 22 ];
     const char *out;
 
     /* notify change of focus with timestamp */
@@ -96,7 +96,7 @@ static void process_event( const struct keystroke_info *info )
 #else
 static void process_event( const struct keystroke_info *info )
 {
-    char time_buf[ 20 ] = { 0 };
+    char time_buf[ 20 ];
 
     /* format timestamp */
     strftime( time_buf , 20 , "%d/%m/%Y %H:%M:%S" ,
