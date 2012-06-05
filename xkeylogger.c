@@ -231,6 +231,30 @@ int translate_device_key_event( XIC xic , XDeviceKeyEvent *event ,
     return 0;
 }
 
+char * get_window_name( Display *display , Window window )
+{
+    Atom name_atom;
+    Atom utf8_atom;
+    Atom type;
+    int format;
+    unsigned long n_items , after;
+    unsigned char *data = NULL;
+
+    /* get atoms */
+    name_atom = XInternAtom( display , "_NET_WM_NAME" , 1 );
+    utf8_atom = XInternAtom( display , "UTF8_STRING" , 1 );
+
+    /* get window property */
+    if ( Success == XGetWindowProperty( display , window , name_atom , 0 , 0xffff ,
+                                        0 , utf8_atom , &type , &format ,
+                                        &n_items , &after , &data ) && data )
+    {
+        return ( char * )data;
+    }
+
+    return NULL;
+}
+
 char * get_current_window( Display *display , Window *out_window )
 {
     int revert_to;
@@ -239,7 +263,7 @@ char * get_current_window( Display *display , Window *out_window )
     /* get focused window */
     XGetInputFocus( display , out_window , &revert_to );
 
-    while ( XFetchName( display , *out_window , &name ) , !name )
+    while ( name = get_window_name( display , *out_window ) , !name )
     {
         Window root;
         Window parent;
