@@ -10,8 +10,6 @@
 #define XK_MISCELLANY
 #include <X11/keysymdef.h>
 
-static int KEY_PRESS_TYPE;
-
 struct keystroke_info
 {
     time_t timestamp;
@@ -251,6 +249,7 @@ char * get_current_window( Display *display , Window *out_window )
 
 int main( int argc , char *argv[] )
 {
+    int KEY_PRESS_TYPE;
     Display *display;
     int screen;
     Window root;
