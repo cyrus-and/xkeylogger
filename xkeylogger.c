@@ -78,8 +78,13 @@ static void process_event( const struct keystroke_info *info )
         break;
 
     default:
-        /* use default translation */
-        if ( info->translation_available )
+        /* use default translation skipping control characters that are not
+           associated to graphocal glyphs */
+        if ( info->translation_available &&
+             !( info->modifier_mask & ControlMask ) &&
+             !( info->modifier_mask & Mod1Mask ) &&
+             !( info->modifier_mask & Mod4Mask ) &&
+             info->original_keysym != XK_Escape )
         {
             out = info->translated_char;
         }
