@@ -31,7 +31,7 @@ struct keystroke_info
     unsigned int modifier_mask;
     int translation_available;
     KeySym translated_keysym;
-    char translated_char[ 4 ];
+    char translated_char[4];
     Window *focused_window;
     char* focused_window_name;
 };
@@ -40,7 +40,7 @@ struct keystroke_info
 static void process_event( const struct keystroke_info *info )
 {
     static char *current = NULL;
-    char time_buf[ 22 ];
+    char time_buf[22];
     const char *out;
 
     /* overload some special keystrokes */
@@ -68,9 +68,9 @@ static void process_event( const struct keystroke_info *info )
         out = VISUAL_LEFT;
         break;
 
-     case XK_Up:
-     case XK_KP_Up:
-         out = VISUAL_UP;
+    case XK_Up:
+    case XK_KP_Up:
+        out = VISUAL_UP;
         break;
 
     case XK_Right:
@@ -78,9 +78,9 @@ static void process_event( const struct keystroke_info *info )
         out = VISUAL_RIGHT;
         break;
 
-     case XK_Down:
-     case XK_KP_Down:
-         out = VISUAL_DOWN;
+    case XK_Down:
+    case XK_KP_Down:
+        out = VISUAL_DOWN;
         break;
 
     default:
@@ -119,7 +119,7 @@ static void process_event( const struct keystroke_info *info )
 #else
 static void process_event( const struct keystroke_info *info )
 {
-    char time_buf[ 20 ];
+    char time_buf[20];
 
     /* format timestamp */
     strftime( time_buf , 20 , "%d/%m/%Y %H:%M:%S" ,
@@ -194,10 +194,10 @@ static XIC get_input_context( Display *display )
     /* search wanted style */
     for ( xim_style = 0 , i = 0 ; i < xim_styles->count_styles ; i++ )
     {
-        if ( xim_styles->supported_styles[ i ] ==
+        if ( xim_styles->supported_styles[i] ==
              ( XIMPreeditNothing | XIMStatusNothing ) )
         {
-            xim_style = xim_styles->supported_styles[ i ];
+            xim_style = xim_styles->supported_styles[i];
             break;
         }
     }
@@ -237,7 +237,7 @@ int translate_device_key_event( XIC xic , XDeviceKeyEvent *event ,
                               out_keysym , &status );
     if ( status == XLookupBoth )
     {
-        out_string[ length ] = '\0';
+        out_string[length] = '\0';
         return 1;
     }
 
