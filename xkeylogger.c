@@ -157,18 +157,18 @@ static int get_keybord_id( Display *display , XID *xid )
     /* get all input devices */
     devices = XListInputDevices( display , &n );
 
-    for ( i = 0 ; i < n ; i++ )
+    for ( i = 0 , *xid = 0 ; i < n ; i++ )
     {
         /* tries to guess the real ketboard */
         if ( strcmp( devices[i].name , "AT Translated Set 2 keyboard" ) == 0 )
         {
             *xid = devices[i].id;
-            return 1;
+            break;
         }
     }
 
     XFreeDeviceList( devices );
-    return 0;
+    return i != n;
 }
 
 static XIC get_input_context( Display *display )
