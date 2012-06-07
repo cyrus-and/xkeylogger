@@ -20,6 +20,7 @@
 #define VISUAL_DOWN "\u2193"
 
 static char *NO_TITLE = "(no title)";
+static char *NO_ACTIVE_WINDOW = "(no active window)";
 
 struct keystroke_info
 {
@@ -260,13 +261,22 @@ int get_window_property( Display *display , Window window , const char *name , c
 
 int get_window_name( Display *display , Window window , char **name )
 {
-    int ret;
+    if ( window )
+    {
+        int ret;
 
-    ret = get_window_property( display , window ,
-                               "_NET_WM_NAME" , "UTF8_STRING" , name );
+        ret = get_window_property( display , window ,
+                                   "_NET_WM_NAME" , "UTF8_STRING" , name );
 
-    if ( ret && !*name ) *name = NO_TITLE;
-    return ret;
+        if ( ret && !*name ) *name = NO_TITLE;
+        return ret;
+    }
+    /* e.g. no windows on the root */
+    else
+    {
+        *name = NO_ACTIVE_WINDOW;
+        return 1;
+    }
 }
 
 int get_current_window( Display *display , Window **window )
@@ -353,7 +363,8 @@ int main( int argc , char *argv[] )
 
         /* cleanup */
         XFree( info.focused_window );
-        if ( info.focused_window_name != NO_TITLE )
+        if ( info.focused_window_name != NO_TITLE &&
+             info.focused_window_name != NO_ACTIVE_WINDOW )
         {
             XFree( info.focused_window_name );
         }
