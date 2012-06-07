@@ -252,7 +252,7 @@ int get_window_property( Display *display , Window window , const char *name , c
     type_atom = XInternAtom( display , type , True );
 
     /* get window property */
-    status = XGetWindowProperty( display , window , name_atom , 0 , 0xffff , False ,
+    status = XGetWindowProperty( display , window , name_atom , False , 0xffff , False ,
                                  type_atom , &actual_type , &format ,
                                  &n_items , &after , ( unsigned char ** )data );
 
