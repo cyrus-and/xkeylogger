@@ -30,7 +30,7 @@ struct keystroke_info
     int translation_available;
     KeySym translated_keysym;
     char translated_char[ 4 ];
-    Window focused_window;
+    Window *focused_window;
     char* focused_window_name;
 };
 
@@ -238,55 +238,44 @@ int translate_device_key_event( XIC xic , XDeviceKeyEvent *event ,
     return 0;
 }
 
-char * get_window_name( Display *display , Window window )
+int get_window_property( Display *display , Window window , const char *name , const char *type , void *data )
 {
     Atom name_atom;
-    Atom utf8_atom;
-    Atom type;
-    int format;
+    Atom type_atom;
+    Atom actual_type;
+    int format , status;
     unsigned long n_items , after;
-    unsigned char *data = NULL;
 
     /* get atoms */
-    name_atom = XInternAtom( display , "_NET_WM_NAME" , 1 );
-    utf8_atom = XInternAtom( display , "UTF8_STRING" , 1 );
+    name_atom = XInternAtom( display , name , True );
+    type_atom = XInternAtom( display , type , True );
 
     /* get window property */
-    if ( Success == XGetWindowProperty( display , window , name_atom , 0 , 0xffff ,
-                                        0 , utf8_atom , &type , &format ,
-                                        &n_items , &after , &data ) && data )
-    {
-        return ( char * )data;
-    }
+    status = XGetWindowProperty( display , window , name_atom , 0 , 0xffff , False ,
+                                 type_atom , &actual_type , &format ,
+                                 &n_items , &after , ( unsigned char ** )data );
 
-    return NULL;
+    return status == Success;
 }
 
-char * get_current_window( Display *display , Window *out_window )
+int get_window_name( Display *display , Window window , char **name )
 {
-    int revert_to;
-    char *name = NULL;
+    int ret;
 
-    /* get focused window */
-    XGetInputFocus( display , out_window , &revert_to );
+    ret = get_window_property( display , window ,
+                               "_NET_WM_NAME" , "UTF8_STRING" , name );
 
-    while ( name = get_window_name( display , *out_window ) , !name )
-    {
-        Window root;
-        Window parent;
-        Window *children;
-        unsigned int n_child;
+    if ( ret && !*name ) *name = NO_TITLE;
+    return ret;
+}
 
-        /* query the hierarchy from that window */
-        XQueryTree( display , *out_window , &root , &parent , &children , &n_child );
-        XFree( children );
+int get_current_window( Display *display , Window **window )
+{
+    Window root;
 
-        /* raise up to the main window */
-        *out_window = parent;
-        if ( parent == root ) return NO_TITLE;
-    }
-
-    return name;
+    root = DefaultRootWindow( display );
+    return get_window_property( display , root ,
+                                "_NET_ACTIVE_WINDOW" , "WINDOW" , window );
 }
 
 int main( int argc , char *argv[] )
@@ -349,8 +338,8 @@ int main( int argc , char *argv[] )
         info.original_keysym =
             XkbKeycodeToKeysym( display , device_event->keycode , 0 , 0 );
         info.modifier_mask = device_event->state;
-        info.focused_window_name =
-            get_current_window( display , &info.focused_window );
+        get_current_window( display , &info.focused_window );
+        get_window_name( display , *info.focused_window , &info.focused_window_name );
 
         /* translate keystroke */
         info.translation_available =
@@ -363,6 +352,7 @@ int main( int argc , char *argv[] )
         process_event( &info );
 
         /* cleanup */
+        XFree( info.focused_window );
         if ( info.focused_window_name != NO_TITLE )
         {
             XFree( info.focused_window_name );
