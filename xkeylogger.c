@@ -14,6 +14,7 @@
 
 #define VISUAL_BACKSPACE "\u232b"
 #define VISUAL_DELETE "\u2326"
+#define VISUAL_TAB "\u21e5"
 #define VISUAL_LEFT "\u2190"
 #define VISUAL_UP "\u2191"
 #define VISUAL_RIGHT "\u2192"
@@ -56,6 +57,10 @@ static void process_event( const struct keystroke_info *info )
 
     case XK_Delete:
         out = VISUAL_DELETE;
+        break;
+
+    case XK_Tab:
+        out = VISUAL_TAB;
         break;
 
     case XK_Left:
