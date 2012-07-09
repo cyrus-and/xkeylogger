@@ -164,7 +164,7 @@ static int get_keybord_id( Display *display , XID *xid )
 
     for ( i = 0 , *xid = 0 ; i < n ; i++ )
     {
-        /* tries to guess the real ketboard */
+        /* try to guess the real keyboard */
         if ( strcmp( devices[i].name , "AT Translated Set 2 keyboard" ) == 0 )
         {
             *xid = devices[i].id;
