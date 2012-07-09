@@ -56,6 +56,7 @@ static void process_event( const struct keystroke_info *info )
         break;
 
     case XK_Delete:
+    case XK_KP_Delete:
         out = VISUAL_DELETE;
         break;
 
