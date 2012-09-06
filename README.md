@@ -1,9 +1,20 @@
 xkeylogger - Simple keylogger for X
 ===================================
 
-xkeylogger intercepts human readable keyboard events (and also some useful
-special keys like backspace) and dumps the resulting translated characters to
-standard output; it also keeps track of the currently focused window.
+xkeylogger just listen for keystrokes and dump the log to standard output.
+
+Features
+--------
+
+ - no root access required
+
+ - keep track of the focused window and dump its name too
+
+ - translate raw keystrokes according to the current keyboard layout
+
+ - log some useful non-printable keystrokes too (backspace, tab, etc.)
+
+ - use the modifiers (shift, control, etc.) to dump the proper glyph
 
 Dependencies
 ------------
@@ -18,6 +29,6 @@ Build
 Usage
 -----
 
-Dump keystrokes to a file (quit with `Control-C` or `SIGTERM`):
+Dump keystrokes to a file (exit with `Control-C` or `SIGTERM`):
 
     $ xkeylogger > key.log
