@@ -238,24 +238,22 @@ static XIC get_input_context( Display *display )
 int translate_device_key_event( XIC xic , XDeviceKeyEvent *event ,
                                 KeySym *out_keysym , char *out_string )
 {
-    XDeviceKeyEvent *device_key_event;
     XKeyEvent key_event;
     Status status;
     int length;
 
     /* build associated key event */
-    device_key_event = ( XDeviceKeyEvent * )event;
     key_event.type = KeyPress;
-    key_event.serial = device_key_event->serial;
-    key_event.send_event= device_key_event->send_event;
-    key_event.display = device_key_event->display;
-    key_event.window = device_key_event->window;
-    key_event.root = device_key_event->root;
-    key_event.subwindow = device_key_event->subwindow;
-    key_event.time = device_key_event->time;
-    key_event.state = device_key_event->state;
-    key_event.keycode = device_key_event->keycode;
-    key_event.same_screen = device_key_event->same_screen;
+    key_event.serial = event->serial;
+    key_event.send_event= event->send_event;
+    key_event.display = event->display;
+    key_event.window = event->window;
+    key_event.root = event->root;
+    key_event.subwindow = event->subwindow;
+    key_event.time = event->time;
+    key_event.state = event->state;
+    key_event.keycode = event->keycode;
+    key_event.same_screen = event->same_screen;
 
     /* translate the keystroke */
     length = XmbLookupString( xic , &key_event , out_string , 4 ,
