@@ -173,7 +173,7 @@ static void process_event( const struct keystroke_info *info )
 }
 #endif
 
-static int get_keybord_id( Display *display , XID *xid )
+static void register_events( Display *display , Window root )
 {
     int i , n;
     XDeviceInfo *devices;
@@ -181,18 +181,24 @@ static int get_keybord_id( Display *display , XID *xid )
     /* get all input devices */
     devices = XListInputDevices( display , &n );
 
-    for ( i = 0 , *xid = 0 ; i < n ; i++ )
+    for ( i = 0 ; i < n ; i++ )
     {
-        /* try to guess the real keyboard */
-        if ( strcmp( devices[i].name , "AT Translated Set 2 keyboard" ) == 0 )
+        /* register events for each slave keyboard device since it's hard to
+           know the device id of the real one */
+        if ( devices[i].use == IsXExtensionKeyboard )
         {
-            *xid = devices[i].id;
-            break;
+            XDevice *device;
+            int KEY_PRESS_TYPE;
+            XEventClass event_class;
+
+            /* open device and register the event */
+            device = XOpenDevice( display , devices[i].id );
+            DeviceKeyPress( device , KEY_PRESS_TYPE , event_class );
+            XSelectExtensionEvent( display , root , &event_class , 1 );
         }
     }
 
     XFreeDeviceList( devices );
-    return i != n;
 }
 
 static XIC get_input_context( Display *display )
@@ -314,13 +320,9 @@ int get_current_window( Display *display , Window **window )
 
 int main( int argc , char *argv[] )
 {
-    int KEY_PRESS_TYPE;
     Display *display;
     int screen;
     Window root;
-    XID keyboard_id;
-    XDevice *device;
-    XEventClass event_class;
     XIC xic;
 
     /* open display */
@@ -334,26 +336,11 @@ int main( int argc , char *argv[] )
     screen = DefaultScreen( display );
     root = RootWindow( display , screen );
 
-    /* lookup the keyboard */
-    if ( !get_keybord_id( display , &keyboard_id ) )
-    {
-        fprintf( stderr , "No keyboards found" );
-        return EXIT_FAILURE;
-    }
-
-    /* open device */
-    if ( device = XOpenDevice( display , keyboard_id ), !device )
-    {
-        fprintf( stderr , "Cannot open device" );
-        return EXIT_FAILURE;
-    }
-
     /* get input context */
     xic = get_input_context( display );
 
-    /* register events */
-    DeviceKeyPress( device , KEY_PRESS_TYPE , event_class );
-    XSelectExtensionEvent( display , root , &event_class , 1 );
+    /* register events for every keyboard */
+    register_events( display , root );
 
     /* event loop */
     while ( 1 )
