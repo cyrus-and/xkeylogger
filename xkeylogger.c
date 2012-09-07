@@ -166,7 +166,7 @@ static void process_event( const struct keystroke_info *info )
     }
 
     /* dump window name */
-    printf( " 0x%lx \"%s\"" , info->focused_window , info->focused_window_name );
+    printf( " 0x%lx \"%s\"" , *info->focused_window , info->focused_window_name );
 
     printf( "\n" );
     fflush( stdout );
