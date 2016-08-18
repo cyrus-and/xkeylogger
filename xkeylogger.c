@@ -37,13 +37,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define SEPARATOR_PREFIX ">>>"
 
-#define VISUAL_BACKSPACE "\u232b"
-#define VISUAL_DELETE "\u2326"
-#define VISUAL_TAB "\u21e5"
-#define VISUAL_LEFT "\u2190"
-#define VISUAL_UP "\u2191"
-#define VISUAL_RIGHT "\u2192"
-#define VISUAL_DOWN "\u2193"
+#define VISUAL_BACKSPACE "⌫"
+#define VISUAL_DELETE "⌦"
+#define VISUAL_TAB "⇥"
+#define VISUAL_LEFT "←"
+#define VISUAL_UP "↑"
+#define VISUAL_RIGHT "→"
+#define VISUAL_DOWN "↓"
 
 static char *NO_TITLE = "(no title)";
 static char *NO_ACTIVE_WINDOW = "(no active window)";
