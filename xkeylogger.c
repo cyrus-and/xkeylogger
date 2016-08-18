@@ -242,8 +242,8 @@ static XIC get_input_context( Display *display )
     return xic;
 }
 
-int translate_device_key_event( XIC xic, XDeviceKeyEvent *event,
-                                KeySym *out_keysym, char *out_string )
+static int translate_device_key_event( XIC xic, XDeviceKeyEvent *event,
+                                       KeySym *out_keysym, char *out_string )
 {
     XKeyEvent key_event;
     Status status;
@@ -274,7 +274,8 @@ int translate_device_key_event( XIC xic, XDeviceKeyEvent *event,
     return 0;
 }
 
-int get_window_property( Display *display, Window window, const char *name, const char *type, void *data )
+static int get_window_property( Display *display, Window window,
+                                const char *name, const char *type, void *data )
 {
     Atom name_atom;
     Atom type_atom;
@@ -294,7 +295,7 @@ int get_window_property( Display *display, Window window, const char *name, cons
     return status == Success;
 }
 
-int get_window_name( Display *display, Window window, char **name )
+static int get_window_name( Display *display, Window window, char **name )
 {
     if ( window )
     {
@@ -314,7 +315,7 @@ int get_window_name( Display *display, Window window, char **name )
     }
 }
 
-int get_current_window( Display *display, Window **window )
+static int get_current_window( Display *display, Window **window )
 {
     Window root;
 
