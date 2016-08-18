@@ -37,17 +37,17 @@ Sample output
 -------------
 
     [+] 06/09/2012 @ 16:44:17 : urxvt
-    cd /tm⇥
-    ls
-    mkdit⌫r test
+    cd /tm⇥⏎
+    ls⏎
+    mkdit⌫r test⏎
 
     [+] 06/09/2012 @ 16:44:56 : cyrus-and/xkeylogger - Google Chrome
-    foo
+    foo⏎
 
     [+] 06/09/2012 @ 16:45:06 : Search · foo - Google Chrome
-    ⌫⌫⌫bar←⌫⌦az
+    ⌫⌫⌫bar←⌫⌦az⏎
 
     [+] 06/09/2012 @ 16:45:28 : Search · baz - Google Chrome
     ⌫⌫⌫
     [+] 06/09/2012 @ 16:45:33 : Google - Google Chrome
-    xkeylogger
+    xkeylogger⏎

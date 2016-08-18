@@ -37,6 +37,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define SEPARATOR_PREFIX "[+]"
 
+#define VISUAL_RETURN "⏎\n"
 #define VISUAL_BACKSPACE "⌫"
 #define VISUAL_DELETE "⌦"
 #define VISUAL_TAB "⇥"
@@ -73,7 +74,7 @@ static void process_event( const struct keystroke_info *info )
     {
     case XK_Return:
     case XK_KP_Enter:
-        out = "\n";
+        out = VISUAL_RETURN;
         break;
 
     case XK_BackSpace:
