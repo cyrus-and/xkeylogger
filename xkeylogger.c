@@ -335,7 +335,7 @@ int main( int argc, char *argv[] )
     /* open display */
     if ( display = XOpenDisplay( NULL ), !display )
     {
-        fprintf( stderr, "Cannot open display" );
+        fprintf( stderr, "Cannot open display\n" );
         return EXIT_FAILURE;
     }
 
