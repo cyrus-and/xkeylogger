@@ -24,7 +24,13 @@ Dependencies
 Build
 -----
 
+To build a dynamically linked executable:
+
     make
+
+To build a statically linked executable:
+
+    make static
 
 Usage
 -----
