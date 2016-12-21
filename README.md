@@ -12,6 +12,8 @@ Features
 
  - Translate raw keystrokes according to the current keyboard layout.
 
+ - Allow to generate a statically linked executable.
+
  - Also log some useful non-printable keystrokes (backspace, tab, etc.).
 
  - Use the modifiers to write the proper glyph.
