@@ -1,6 +1,6 @@
 /*
 
-xkeylogger - Simple keylogger for X
+xkeylogger - Rootless keylogger for X
 
 Copyright (c) 2018 Andrea Cardaci <cyrus.and@gmail.com>
 
