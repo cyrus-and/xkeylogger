@@ -218,7 +218,7 @@ static XIC get_input_context( Display *display )
     XIC xic;
 
     /* open input method */
-    assert( xim = XOpenIM( display, NULL, NULL, NULL ) );
+    assert(( xim = XOpenIM( display, NULL, NULL, NULL ) ));
 
     /* fetch styles  */
     assert( !XGetIMValues( xim, XNQueryInputStyle, &xim_styles, NULL ) );
@@ -237,7 +237,7 @@ static XIC get_input_context( Display *display )
     assert( xim_style != 0 );
 
     /* create input context */
-    assert( xic = XCreateIC( xim, XNInputStyle, xim_style, NULL ) );
+    assert(( xic = XCreateIC( xim, XNInputStyle, xim_style, NULL ) ));
 
     XFree( xim_styles );
     return xic;
