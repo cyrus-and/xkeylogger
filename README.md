@@ -1,10 +1,8 @@
-xkeylogger
-==========
+# xkeylogger
 
-Simple keylogger for X.
+Rootless keylogger for X.
 
-Features
---------
+## Features
 
  - No root access required.
 
@@ -18,44 +16,50 @@ Features
 
  - Use the modifiers to write the proper glyph.
 
-Dependencies
-------------
+## Dependencies
 
-    libxi-dev
+```
+apt-get install libxi-dev
+```
 
-Build
------
+## Build
 
 To build a dynamically linked executable:
 
-    make
+```
+make
+```
 
 To build a statically linked executable:
 
-    make static
+```
+make static
+```
 
-Usage
------
+## Usage
 
 Dump keystrokes to a file (exit by killing the process):
 
-    xkeylogger > key.log
+```
+xkeylogger > key.log
+```
 
-Sample output
--------------
+## Sample output
 
-    [+] 06/09/2012 @ 16:44:17 : urxvt
-    cd /tm⇥⏎
-    ls⏎
-    mkdit⌫r test⏎
+```
+[+] 06/09/2012 @ 16:44:17 : urxvt
+cd /tm⇥⏎
+ls⏎
+mkdit⌫r test⏎
 
-    [+] 06/09/2012 @ 16:44:56 : cyrus-and/xkeylogger - Google Chrome
-    foo⏎
+[+] 06/09/2012 @ 16:44:56 : cyrus-and/xkeylogger - Google Chrome
+foo⏎
 
-    [+] 06/09/2012 @ 16:45:06 : Search · foo - Google Chrome
-    ⌫⌫⌫bar←⌫⌦az⏎
+[+] 06/09/2012 @ 16:45:06 : Search · foo - Google Chrome
+⌫⌫⌫bar←⌫⌦az⏎
 
-    [+] 06/09/2012 @ 16:45:28 : Search · baz - Google Chrome
-    ⌫⌫⌫
-    [+] 06/09/2012 @ 16:45:33 : Google - Google Chrome
-    xkeylogger⏎
+[+] 06/09/2012 @ 16:45:28 : Search · baz - Google Chrome
+⌫⌫⌫
+[+] 06/09/2012 @ 16:45:33 : Google - Google Chrome
+xkeylogger⏎
+```
